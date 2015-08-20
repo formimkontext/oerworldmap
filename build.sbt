@@ -17,7 +17,9 @@ libraryDependencies ++= Seq(
   "org.json" % "json" % "20141113",
   "com.samskivert" % "jmustache" % "1.10",
   "org.pegdown" % "pegdown" % "1.5.0",
-  "org.apache.avro" % "avro" % "1.7.7"
+  "org.apache.avro" % "avro" % "1.7.7",
+  "org.eclipse.persistence" % "org.eclipse.persistence.core" % "2.6.0",
+  "org.eclipse.persistence" % "org.eclipse.persistence.moxy" % "2.6.0"
 )
 
 includeFilter in (Assets, LessKeys.less) := "main.less"
