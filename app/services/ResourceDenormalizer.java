@@ -32,6 +32,8 @@ public class ResourceDenormalizer {
     // mKnownInverseRelations.put("mentionedIn", "mentions");
     mKnownInverseRelations.put("participant", "participantIn");
     mKnownInverseRelations.put("participantIn", "participant");
+    mKnownInverseRelations.put("employee", "affiliation");
+    mKnownInverseRelations.put("affiliation", "employee");
   }
 
   final private static List<String> mListValueEntries = new ArrayList<>();

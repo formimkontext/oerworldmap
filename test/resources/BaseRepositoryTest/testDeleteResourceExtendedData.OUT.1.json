@@ -1,0 +1,95 @@
+{
+  "countryChampionFor" : [ "DE" ],
+  "@type" : "Organization",
+  "created" : [ {
+    "creator" : [ {
+      "@type" : "Organization",
+      "name" : [ {
+        "@value" : "Hanns Worscht",
+        "@language" : "en"
+      } ],
+      "@id" : "7930"
+    } ],
+    "mainEntity" : {
+      "@type" : "Action",
+      "name" : [ {
+        "@value" : "OERAction001",
+        "@language" : "en"
+      } ],
+      "@id" : "7927"
+    },
+    "articleBody" : [ {
+      "@value" : "What a wonderful Action",
+      "@language" : "en"
+    } ],
+    "@type" : "Article",
+    "mentions" : [ {
+      "@type" : "Service",
+      "name" : [ {
+        "@value" : "OERService002",
+        "@language" : "en"
+      } ],
+      "@id" : "7929"
+    }, {
+      "@type" : "Service",
+      "name" : [ {
+        "@value" : "OERService001",
+        "@language" : "en"
+      } ],
+      "@id" : "7928"
+    }, {
+      "@type" : "Organization",
+      "name" : [ {
+        "@value" : "OEROrga200",
+        "@language" : "en"
+      } ],
+      "@id" : "c81h"
+    }, {
+      "@type" : "Organization",
+      "name" : [ {
+        "@value" : "OEROrga100",
+        "@language" : "en"
+      } ],
+      "@id" : "c81g"
+    }, {
+      "@type" : "Action",
+      "name" : [ {
+        "@value" : "OERAction002",
+        "@language" : "en"
+      } ],
+      "@id" : "c81f"
+    }, {
+      "@type" : "Service",
+      "name" : [ {
+        "@value" : "OERService003",
+        "@language" : "en"
+      } ],
+      "@id" : "0c7d"
+    } ],
+    "name" : [ {
+      "@value" : "OEROrga001",
+      "@language" : "en"
+    } ],
+    "@id" : "7922",
+    "@context" : "http://schema.org/"
+  } ],
+  "name" : [ {
+    "@value" : "Hanns Worscht",
+    "@language" : "en"
+  } ],
+  "location" : {
+    "geo" : {
+      "lon" : 6.93551400842729,
+      "lat" : 50.9341361
+    },
+    "address" : {
+      "addressCountry" : "DE",
+      "@type" : "PostalAddress",
+      "postalCode" : "50674",
+      "addressLocality" : "Köln"
+    },
+    "@type" : "Place"
+  },
+  "@id" : "7930",
+  "email" : "abc@oerworldmap.org"
+}

@@ -2,8 +2,10 @@ package services.repository;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 
@@ -36,11 +38,103 @@ public class BaseRepository extends Repository
   }
 
   @Override
-  public Resource deleteResource(@Nonnull String aId) {
-    if (null == mElasticsearchRepo.deleteResource(aId + "." + Record.RESOURCEKEY)) {
+  public Resource deleteResource(@Nonnull String aId) throws IOException {
+    Resource resource = getResource(aId);
+    if (null == resource) {
+      return null;
+    }
+    int level = 0;
+    List<Resource> innerResources = getInnerResources(resource, level);
+    for (Resource innerResource : innerResources) {
+      Resource repoResource = getRepoEntry(innerResource);
+      if (null != repoResource) {
+        deleteReferences(repoResource, level + 1, aId, repoResource);
+      }
+    }
+    // finally delete the resource itself
+    mElasticsearchRepo.deleteResource(aId + "." + Record.RESOURCEKEY);
+    return mFileRepo.deleteResource(aId + "." + Record.RESOURCEKEY);
+  }
+
+  private void deleteReferences(Resource aResource, int aLevel, String aId, Resource aStoreResource)
+      throws IOException {
+    for (Iterator<Map.Entry<String, Object>> it = aResource.entrySet().iterator(); it.hasNext();) {
+      Map.Entry<String, Object> entry = it.next();
+      if (entry.getValue() instanceof Resource) {
+        Resource innerResource = (Resource) entry.getValue();
+        if (innerResource.getAsString(JsonLdConstants.ID).equals(aId)) {
+          it.remove();
+          postRemoveFirstLevelReferenceEntry(aResource, aLevel, aId);
+          reAddResource(aStoreResource);
+        } //
+        else if (aLevel > 1) {
+          deleteReferences(innerResource, aLevel, aId, aResource);
+        }
+      } //
+      else if (entry.getValue() instanceof List<?>) {
+        List<?> list = (List<?>) entry.getValue();
+        for (Object item : list) {
+          if (item instanceof Resource) {
+            Resource innerResource = (Resource) item;
+            if (innerResource.getAsString(JsonLdConstants.ID).equals(aId)) {
+              list.remove(item);
+              if (list.isEmpty()) {
+                it.remove();
+              }
+              postRemoveFirstLevelReferenceEntry(aResource, aLevel, aId);
+              reAddResource(aStoreResource);
+            } //
+            else if (aLevel > 1) {
+              deleteReferences(innerResource, aLevel, aId, aResource);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private void postRemoveFirstLevelReferenceEntry(Resource aResource, int aLevel, String aId)
+      throws IOException {
+    List<Resource> otherInnerResources = getInnerResources(aResource, aLevel);
+    for (Resource otherInnerResource : otherInnerResources) {
+      Resource repoResource = getRepoEntry(otherInnerResource);
+      if (null != repoResource) {
+        deleteReferences(repoResource, aLevel + 1, aId, aResource);
+      }
+    }
+  }
+
+  private void reAddResource(Resource aResource) throws IOException {
+    String type = aResource.getAsString(JsonLdConstants.TYPE);
+    addResource(getRecord(aResource), type);
+  }
+
+  private List<Resource> getInnerResources(Resource aResource, int aLevel) {
+    List<Resource> result = new ArrayList<>();
+    if (aLevel > 1) {
+      return result;
+    }
+    for (Entry<String, Object> entry : aResource.entrySet()) {
+      if (entry.getValue() instanceof Resource) {
+        result.add((Resource) entry.getValue());
+      } else if (entry.getValue() instanceof List<?>) {
+        List<?> innerList = (List<?>) entry.getValue();
+        for (Object item : innerList) {
+          if (item instanceof Resource) {
+            result.add((Resource) item);
+          }
+        }
+      }
+    }
+    return result;
+  }
+
+  private Resource getRepoEntry(Resource aResourceStub) {
+    String id = aResourceStub.getAsString(JsonLdConstants.ID);
+    if (null == id) {
       return null;
     } else {
-      return mFileRepo.deleteResource(aId + "." + Record.RESOURCEKEY);
+      return getResource(id);
     }
   }
 
@@ -60,7 +154,8 @@ public class BaseRepository extends Repository
   @Override
   public void addResource(@Nonnull Resource aResource, @Nonnull String aType) throws IOException {
     mElasticsearchRepo.addResource(aResource, aType);
-    // FIXME: As is the case for getResource, this may result in too many open files
+    // FIXME: As is the case for getResource, this may result in too many open
+    // files
     // mFileRepo.addResource(aResource, aType);
   }
 
@@ -112,7 +207,8 @@ public class BaseRepository extends Repository
   public Resource getResource(@Nonnull String aId) {
     Resource resource = mElasticsearchRepo.getResource(aId + "." + Record.RESOURCEKEY);
     if (resource == null || resource.isEmpty()) {
-      // FIXME: This may lead to inconsistencies (too many open files) when ES and FS are out of sync
+      // FIXME: This may lead to inconsistencies (too many open files) when ES
+      // and FS are out of sync
       // resource = mFileRepo.getResource(aId + "." + Record.RESOURCEKEY);
     }
     if (resource != null) {
