@@ -12,3 +12,4 @@ data/*/
 !data/pages/
 repo-deb-build*.*
 .idea/
+files/*/

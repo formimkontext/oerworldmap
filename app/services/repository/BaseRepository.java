@@ -1,5 +1,6 @@
 package services.repository;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,16 +25,15 @@ import play.Logger;
 import services.QueryContext;
 import services.ResourceDenormalizer;
 
-public class BaseRepository extends Repository
-    implements Readable, Writable, Queryable, Aggregatable {
+public class BaseRepository extends Repository implements Readable, Writable, Queryable, Aggregatable, FileStorage {
 
   private static ElasticsearchRepository mElasticsearchRepo;
-  // private static FileRepository mFileRepo;
+  private static FileRepository mFileRepo;
 
   public BaseRepository(Config aConfiguration) {
     super(aConfiguration);
     mElasticsearchRepo = new ElasticsearchRepository(aConfiguration);
-    // mFileRepo = new FileRepository(aConfiguration);
+    mFileRepo = new FileRepository(aConfiguration);
   }
 
   @Override
@@ -103,7 +103,7 @@ public class BaseRepository extends Repository
 
   @Override
   public ResourceList query(@Nonnull String aQueryString, int aFrom, int aSize, String aSortOrder,
-                            Map<String, ArrayList<String>> aFilters) {
+      Map<String, ArrayList<String>> aFilters) {
     return query(aQueryString, aFrom, aSize, aSortOrder, aFilters, null);
   }
 
@@ -197,6 +197,20 @@ public class BaseRepository extends Repository
       Logger.error(e.toString());
     }
     return resources;
+  }
+
+  public String addFile(File aFile, String aExtension) throws IOException {
+    return mFileRepo.addFile(aFile, aExtension);
+  }
+
+  @Override
+  public File getFile(String aName, String aContentType) throws IOException {
+    return mFileRepo.getFile(aName, aContentType);
+  }
+
+  @Override
+  public String deleteFile(String aPath) throws IOException {
+    return mFileRepo.deleteFile(aPath);
   }
 
 }

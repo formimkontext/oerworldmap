@@ -1,35 +1,45 @@
 package services.repository;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.typesafe.config.Config;
-import helpers.JsonLdConstants;
-
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import javax.annotation.Nonnull;
 
-import models.Resource;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.typesafe.config.Config;
 
-public class FileRepository extends Repository implements Writable, Readable {
+import helpers.JsonLdConstants;
+import models.Resource;
+
+public class FileRepository extends Repository implements Writable, Readable, FileStorage {
 
   private TypeReference<HashMap<String, Object>> mMapType = new TypeReference<HashMap<String, Object>>() {
   };
+
+  public FileRepository(Config aConfiguration) {
+    super(aConfiguration);
+
+  }
 
   private Path getPath() {
     return Paths.get(mConfiguration.getString("filerepo.dir"));
   }
 
-  public FileRepository(Config aConfiguration) {
-    super(aConfiguration);
+  public Path getFileRoot() {
+    return Paths.get(mConfiguration.getString("files.rootdir"));
   }
 
   /**
@@ -54,7 +64,7 @@ public class FileRepository extends Repository implements Writable, Readable {
    * 
    * @param aId
    * @return the Resource by the given identifier or null if no such Resource
-   * exists.
+   *         exists.
    */
   @Override
   public Resource getResource(@Nonnull String aId) {
@@ -72,7 +82,8 @@ public class FileRepository extends Repository implements Writable, Readable {
   /**
    * Query all resources of a given type.
    *
-   * @param aType The type of the resources to get
+   * @param aType
+   *          The type of the resources to get
    * @return All resources of the given type as a List.
    */
   @Override
@@ -100,7 +111,6 @@ public class FileRepository extends Repository implements Writable, Readable {
     return results;
   }
 
-
   /**
    * Delete a Resource specified by the given identifier.
    * 
@@ -120,22 +130,20 @@ public class FileRepository extends Repository implements Writable, Readable {
 
   private Path getResourcePath(@Nonnull final String aId) throws IOException {
     String encodedId = DigestUtils.sha256Hex(aId);
-    DirectoryStream<Path> typeDirs = Files.newDirectoryStream(getPath(),
-        new DirectoryStream.Filter<Path>() {
-          @Override
-          public boolean accept(Path entry) throws IOException {
-            return Files.isDirectory(entry);
-          }
-        });
+    DirectoryStream<Path> typeDirs = Files.newDirectoryStream(getPath(), new DirectoryStream.Filter<Path>() {
+      @Override
+      public boolean accept(Path entry) throws IOException {
+        return Files.isDirectory(entry);
+      }
+    });
 
     for (Path typeDir : typeDirs) {
-      DirectoryStream<Path> resourceFiles = Files.newDirectoryStream(typeDir,
-          new DirectoryStream.Filter<Path>() {
-            @Override
-            public boolean accept(Path entry) throws IOException {
-              return (entry.getFileName().toString().equals(encodedId));
-            }
-          });
+      DirectoryStream<Path> resourceFiles = Files.newDirectoryStream(typeDir, new DirectoryStream.Filter<Path>() {
+        @Override
+        public boolean accept(Path entry) throws IOException {
+          return (entry.getFileName().toString().equals(encodedId));
+        }
+      });
       for (Path resourceFile : resourceFiles) {
         return resourceFile;
       }
@@ -143,6 +151,54 @@ public class FileRepository extends Repository implements Writable, Readable {
 
     throw new IOException(aId + " not found.");
 
+  }
+
+  @Override
+  public String addFile(@Nonnull File aFile, @Nonnull String aExtension) throws IOException {
+
+    File dir = new File(getFileRoot().toString() + File.separator + aExtension.toLowerCase());
+    if (!dir.exists()) {
+      dir.mkdir();
+    }
+
+    String targetPath = dir + File.separator + generateId() + "." + aExtension.toLowerCase();
+    new File(targetPath).createNewFile();
+    FileOutputStream out = new FileOutputStream(targetPath);
+    Files.copy(aFile.toPath(), out);
+
+    return targetPath;
+  }
+
+  @Override
+  public File getFile(String aName, String aContentType) throws IOException {
+    return getFile(getFileRoot().toString() + File.separator);
+  }
+
+  public File getFile(String aFullQualifiedPath) throws IOException {
+    File file = new File(aFullQualifiedPath);
+    if (file.exists() && file.canRead()) {
+      return file;
+    }
+    return null;
+  }
+
+  @Override
+  public String deleteFile(String aPath) throws IOException {
+    String result;
+    File toBeDeleted = new File(aPath);
+    if (!toBeDeleted.exists()) {
+      result = "File does not exist: " + aPath;
+    } else if (toBeDeleted.canWrite()) {
+      result = "File can not be deleted: " + aPath;
+    } else {
+      toBeDeleted.delete();
+      result = "File was deleted: " + aPath;
+    }
+    return result;
+  }
+
+  private static String generateId() {
+    return UUID.randomUUID().toString();
   }
 
 }
