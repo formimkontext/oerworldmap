@@ -17,14 +17,26 @@ public class FileController extends OERWorldMap {
 
   public static Result uploadPictureFromMultipartForm() throws IOException {
 
-    play.mvc.Http.MultipartFormData body = request().body().asMultipartFormData();
-    play.mvc.Http.MultipartFormData.FilePart picture = null;
-    if (null != body) {
-      picture = body.getFile("picture");
+    File file = null;
+    String extension = null;
+
+    try {
+      play.mvc.Http.MultipartFormData body = request().body().asMultipartFormData();
+      play.mvc.Http.MultipartFormData.FilePart picture = null;
+      if (null != body) {
+        picture = body.getFile("picture");
+      }
+      if (picture != null) {
+        extension = picture.getFilename().substring(picture.getFilename().lastIndexOf("."));
+        file = picture.getFile();
+      }
+    } //
+    catch (Exception e) {
+      file = request().body().asRaw().asFile();
+      extension = file.getName().substring(file.getName().lastIndexOf("."));
     }
-    if (picture != null) {
-      String extension = picture.getFilename().substring(picture.getFilename().lastIndexOf("."));
-      File file = picture.getFile();
+
+    if (null != file && null != extension) {
       mBaseRepository.addFile(file, extension);
       return ok("File uploaded");
     } else {
