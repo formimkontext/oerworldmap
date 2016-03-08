@@ -12,6 +12,20 @@ function makeid() {
 
 var Hijax = (function ($, Hijax) {
 
+  // Variable to store your files
+  var files;
+
+  // Grab the files and set them to our variable
+  function prepareUpload(event) {
+    files = event.target.files;
+  }
+
+  // Catch the form submit and upload the files
+  function uploadFiles(event) {
+    //TODO: handle file upload(s)
+    console.log(files);
+  }
+
   var my = {
     attach: function(context) {
 
@@ -93,6 +107,11 @@ var Hijax = (function ($, Hijax) {
           event.preventDefault();
         }
       });
+
+      // events for file upload via ajax
+      $('form', context).on('change', 'input[type=file]', prepareUpload);
+      $('form', context).submit(uploadFiles);
+
     }
   }
 
