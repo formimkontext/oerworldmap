@@ -15,13 +15,15 @@ import play.mvc.Result;
 
 public class FileController extends OERWorldMap {
 
-  public static Result uploadPictureFromMultipartForm() throws IOException {
+  public static Result uploadFilesFromMultipartForm() throws IOException {
 
     File file = null;
     String extension = null;
 
     try {
       play.mvc.Http.MultipartFormData body = request().body().asMultipartFormData();
+      // TODO: iterate body.getFiles() -> error if 0 or > 1
+      // else store
       play.mvc.Http.MultipartFormData.FilePart picture = null;
       if (null != body) {
         picture = body.getFile("picture");
@@ -38,12 +40,14 @@ public class FileController extends OERWorldMap {
 
     if (null != file && null != extension) {
       mBaseRepository.addFile(file, extension);
-      return ok("File uploaded");
+      //TODO: Set Location-Header to new file
+      return created("File uploaded");
     } else {
-      flash("error", "Missing file");
-      Resource contextResource = getResource();
-      return badRequest(render("Create failed", "feedback.mustache", getPictureScope(contextResource),
-          getErrorMessages(contextResource)));
+      return badRequest("Failed to upload file");
+      // flash("error", "Missing file");
+      // Resource contextResource = getResource();
+      // return badRequest(render("Create failed", "feedback.mustache", getPictureScope(contextResource),
+      //    getErrorMessages(contextResource)));
     }
   }
 

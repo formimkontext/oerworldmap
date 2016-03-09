@@ -17,4 +17,5 @@ GET     /country/$id<.+>      controllers.CountryIndex.read(id: String, embed: B
 POST    /.auth                controllers.UserIndex.deleteToken()
 GET     /.auth                controllers.UserIndex.manageToken()
 POST    /.token               controllers.UserIndex.sendToken()
+POST    /file                 controllers.FileController.uploadFilesFromMultipartForm()
 GET     /:page                controllers.StaticPage.get(page: String)
