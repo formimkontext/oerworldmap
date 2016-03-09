@@ -2,6 +2,7 @@ package controllers;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 
 import play.mvc.Http.MultipartFormData.FilePart;
@@ -31,7 +32,9 @@ public class FileController extends OERWorldMap {
     }
 
     if (null != file && null != extension) {
-      response().setHeader("File-URL", mBaseRepository.addFile(file, extension));
+      String location = mBaseRepository.addFile(file, extension);
+      String path = Paths.get("").toAbsolutePath().toString();
+      response().setHeader("Location", "file://" + path + File.separator + location);
       return created("File uploaded");
     } //
     else {
