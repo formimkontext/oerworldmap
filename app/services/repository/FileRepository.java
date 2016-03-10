@@ -1,6 +1,7 @@
 package services.repository;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -183,14 +184,16 @@ public class FileRepository extends Repository implements Writable, Readable, Fi
   }
 
   @Override
-  public String deleteFile(String aPath) throws IOException {
+  public String deleteFile(String aPath) throws FileNotFoundException, IllegalAccessException {
     String result;
     File toBeDeleted = new File(aPath);
     if (!toBeDeleted.exists()) {
-      result = "File does not exist: " + aPath;
-    } else if (toBeDeleted.canWrite()) {
-      result = "File can not be deleted: " + aPath;
-    } else {
+      throw new FileNotFoundException("File does not exist: " + aPath);
+    } //
+    else if (toBeDeleted.canWrite()) {
+      throw new IllegalAccessException("File can not be deleted: " + aPath);
+    } //
+    else {
       toBeDeleted.delete();
       result = "File was deleted: " + aPath;
     }

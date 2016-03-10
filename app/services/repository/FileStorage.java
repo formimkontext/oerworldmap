@@ -1,6 +1,7 @@
 package services.repository;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import javax.annotation.Nonnull;
@@ -39,7 +40,8 @@ public interface FileStorage {
    * @param aPath
    *          The path to the file to be deleted.
    * @return a String providing information about the success of the deletion.
+   * @throws IllegalAccessException
    */
-  String deleteFile(@Nonnull String aPath) throws IOException;
+  String deleteFile(@Nonnull String aPath) throws FileNotFoundException, IllegalAccessException;
 
 }

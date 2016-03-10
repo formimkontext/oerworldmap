@@ -1,6 +1,7 @@
 package services.repository;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -209,7 +210,7 @@ public class BaseRepository extends Repository implements Readable, Writable, Qu
   }
 
   @Override
-  public String deleteFile(String aPath) throws IOException {
+  public String deleteFile(String aPath) throws FileNotFoundException, IllegalAccessException {
     return mFileRepo.deleteFile(aPath);
   }
 

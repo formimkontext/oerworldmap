@@ -1,6 +1,7 @@
 package controllers;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
@@ -40,6 +41,19 @@ public class FileController extends OERWorldMap {
     else {
       return badRequest("Failed to upload file");
     }
+  }
+
+  public static Result deleteFile(String aURL) {
+    try {
+      return ok(mBaseRepository.deleteFile(aURL));
+    } //
+    catch (FileNotFoundException fnfe) {
+      return badRequest("Could not find requested file: " + aURL);
+    } //
+    catch (IllegalAccessException iae) {
+      return badRequest("File is not accessible: " + aURL);
+    }
+
   }
 
 }
