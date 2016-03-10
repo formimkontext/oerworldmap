@@ -7,16 +7,16 @@ import static play.test.Helpers.route;
 import static play.test.Helpers.running;
 import static play.test.Helpers.status;
 
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import helpers.ElasticsearchTestGrid;
-import helpers.JsonTest;
 import org.junit.Test;
 
+import helpers.AuthTest;
+import helpers.ElasticsearchTestGrid;
 import helpers.JsonLdConstants;
+import helpers.JsonTest;
 import models.Resource;
 import play.mvc.Result;
 
@@ -30,7 +30,7 @@ public class ResourceIndexTest extends ElasticsearchTestGrid implements JsonTest
     running(fakeApplication(), new Runnable() {
       @Override
       public void run() {
-        String auth = getAuthString();
+        String auth = AuthTest.getAuthString();
         Map<String, String> data = new HashMap<>();
         data.put(JsonLdConstants.TYPE, "Person");
         data.put(JsonLdConstants.ID, UUID.randomUUID().toString());
@@ -47,7 +47,7 @@ public class ResourceIndexTest extends ElasticsearchTestGrid implements JsonTest
     running(fakeApplication(), new Runnable() {
       @Override
       public void run() {
-        String auth = getAuthString();
+        String auth = AuthTest.getAuthString();
         Resource organization = getResourceFromJsonFileUnsafe("SchemaTest/testOrganization.json");
         Result result = route(fakeRequest("POST", routes.ResourceIndex.create().url())
             .withHeader("Authorization", "Basic " + auth).withJsonBody(organization.toJson()));
@@ -62,9 +62,9 @@ public class ResourceIndexTest extends ElasticsearchTestGrid implements JsonTest
       @Override
       public void run() {
         Resource organization = getResourceFromJsonFileUnsafe("SchemaTest/testOrganization.json");
-        String auth = getAuthString();
+        String auth = AuthTest.getAuthString();
         Result createResult = route(fakeRequest("POST", routes.ResourceIndex.create().url())
-          .withHeader("Authorization", "Basic " + auth).withJsonBody(organization.toJson()));
+            .withHeader("Authorization", "Basic " + auth).withJsonBody(organization.toJson()));
         assertEquals(201, status(createResult));
         Result updateResult = route(fakeRequest("POST", routes.ResourceIndex.update(organization.getId()).url())
             .withHeader("Authorization", "Basic " + auth).withJsonBody(organization.toJson()));
@@ -78,14 +78,14 @@ public class ResourceIndexTest extends ElasticsearchTestGrid implements JsonTest
     running(fakeApplication(), new Runnable() {
       @Override
       public void run() {
-        String auth = getAuthString();
+        String auth = AuthTest.getAuthString();
         Resource person = new Resource("Person");
         person.put("email", Global.getConfig().getString("admin.user"));
         Result createResult = route(fakeRequest("POST", routes.ResourceIndex.create().url())
-          .withHeader("Authorization", "Basic " + auth).withJsonBody(person.toJson()));
+            .withHeader("Authorization", "Basic " + auth).withJsonBody(person.toJson()));
         assertEquals(201, status(createResult));
         Result updateResult = route(fakeRequest("POST", routes.UserIndex.update(person.getId()).url())
-          .withHeader("Authorization", "Basic " + auth).withJsonBody(person.toJson()));
+            .withHeader("Authorization", "Basic " + auth).withJsonBody(person.toJson()));
         assertEquals(200, status(updateResult));
       }
     });
@@ -96,14 +96,14 @@ public class ResourceIndexTest extends ElasticsearchTestGrid implements JsonTest
     running(fakeApplication(), new Runnable() {
       @Override
       public void run() {
-        String auth = getAuthString();
+        String auth = AuthTest.getAuthString();
         Resource person = new Resource("Person");
         person.put("email", "foo@bar.de");
         Result createResult = route(fakeRequest("POST", routes.ResourceIndex.create().url())
-          .withHeader("Authorization", "Basic " + auth).withJsonBody(person.toJson()));
+            .withHeader("Authorization", "Basic " + auth).withJsonBody(person.toJson()));
         assertEquals(201, status(createResult));
         Result updateResult = route(fakeRequest("POST", routes.UserIndex.update(person.getId()).url())
-          .withHeader("Authorization", "Basic " + auth).withJsonBody(person.toJson()));
+            .withHeader("Authorization", "Basic " + auth).withJsonBody(person.toJson()));
         assertEquals(403, status(updateResult));
       }
     });
@@ -115,20 +115,12 @@ public class ResourceIndexTest extends ElasticsearchTestGrid implements JsonTest
       @Override
       public void run() {
         Resource organization = getResourceFromJsonFileUnsafe("SchemaTest/testOrganization.json");
-        String auth = getAuthString();
+        String auth = AuthTest.getAuthString();
         Result updateResult = route(fakeRequest("POST", routes.ResourceIndex.update(organization.getId()).url())
             .withHeader("Authorization", "Basic " + auth).withJsonBody(organization.toJson()));
         assertEquals(400, status(updateResult));
       }
     });
-  }
-
-
-  private String getAuthString() {
-    String email = Global.getConfig().getString("admin.user");
-    String pass = Global.getConfig().getString("admin.pass");
-    String authString = email.concat(":").concat(pass);
-    return Base64.getEncoder().encodeToString(authString.getBytes());
   }
 
 }
