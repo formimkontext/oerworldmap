@@ -44,7 +44,7 @@ public class FileControllerTest extends ElasticsearchTestGrid implements JsonTes
       public void run() {
 
         // setup test
-        URL url = mApp.getWrappedApplication().resource("valid_import.pptx").get();
+        URL url = mApp.getWrappedApplication().resource("FileControllerTest/image06.gif").get();
         File file = null;
         try {
           file = new File(url.toURI());
@@ -52,9 +52,8 @@ public class FileControllerTest extends ElasticsearchTestGrid implements JsonTes
           e.printStackTrace();
         }
         TemporaryFile temporaryFile = new TemporaryFile(file);
-        MultipartFormData.FilePart<?> filePath = new MultipartFormData.FilePart("file", "valid_import.pptx",
-            new scala.Some<>("application/vnd.openxmlformats-officedocument.presentationml.presentation"),
-            temporaryFile);
+        MultipartFormData.FilePart<?> filePath = new MultipartFormData.FilePart("file",
+            "FileControllerTest/image06.gif", new scala.Some<>("image/gif"), temporaryFile);
         List<MultipartFormData.FilePart<?>> fileParts = new ArrayList<>();
         fileParts.add(filePath);
         scala.collection.immutable.Seq<?> files = scala.collection.JavaConversions.asScalaBuffer(fileParts).toList();
