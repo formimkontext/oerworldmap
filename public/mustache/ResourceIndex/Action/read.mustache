@@ -14,7 +14,7 @@
 
         {{#scope}}
 
-            <div class="resource">
+            <article class="resource" data-behaviour="populateMap">
 
                 <script type="application/ld+json">
                     {{{.}}}
@@ -29,8 +29,12 @@
                 <div class="resource-header">
 
                     <h1 class="resource-title">
-                        {{getIcon "Action"}}
-                        {{#name}}{{@value}}{{/name}}
+                        {{getIcon @type}}
+                        {{#localized name}}
+                            {{[@value]}}
+                        {{else}}
+                            {{[@id]}}
+                        {{/localized}}
                     </h1>
 
                     {{#additionalType}}
@@ -50,9 +54,9 @@
                     </div>
                 {{/image}}
 
-                {{#description}}
-                    <p>{{{@value}}}</p>
-                {{/description}}
+                {{#localized description}}
+                    <p>{{{[@value]}}}</p>
+                {{/localized}}
 
                 {{#url}}
                     <p>
@@ -67,7 +71,7 @@
 
                     {{#if email}}
                         <tr>
-                            <td>Email Address</td>
+                            <td>{{i18n "Action.email"}}</td>
                             <td>
                                 <a href="mailto:{{{obfuscate email}}}">{{{obfuscate email}}}</a>
                             </td>
@@ -76,12 +80,12 @@
 
                     {{#if alternateName}}
                         <tr>
-                            <td>Alternate Names</td>
+                            <td>{{i18n "Action.email"}}</td>
                             <td>
                                 <ul class="comma-seperated-list">
-                                    {{#alternateName}}
-                                        <li>{{@value}}</li>
-                                    {{/alternateName}}
+                                    {{#localized alternateName}}
+                                        <li>{{[@value]}}</li>
+                                    {{/localized}}
                                 </ul>
                             </td>
                         </tr>
@@ -89,7 +93,7 @@
 
                     {{#if sameAs}}
                         <tr>
-                            <td>Links</td>
+                            <td>{{i18n "Action.sameAs"}}</td>
                             <td>
                                 <ul class="resource-list truncated">
                                     {{#sameAs}}
@@ -102,13 +106,13 @@
 
                     {{#if startTime}}
                         <tr>
-                            <td>Duration</td>
+                            <td>{{i18n "Action.startTime"}} - {{i18n "Action.endTime"}}</td>
                             <td>{{startTime}} - {{endTime}}</td>
                         </tr>
                     {{/if}}
 
                     <tr>
-                        <td>Location</td>
+                        <td>{{i18n "Action.location"}}</td>
                         <td>
                             {{#location}}
                                 {{>ResourceIndex/Place/read.mustache}}
@@ -118,11 +122,11 @@
 
                     {{#if mentionedIn}}
                         <tr>
-                            <td>{{i18n "mentioned_in"}}</td>
+                            <td>{{i18n "Action.mentionedIn"}}</td>
                             <td>
                                 <ul class="resource-list truncated">
                                     {{#mentionedIn}}
-                                        <li>{{> (stringFormat "ResourceIndex/%s/link.mustache" @type) }}</li>
+                                        <li>{{>ResourceIndex/link.mustache}}</li>
                                     {{/mentionedIn}}
                                 </ul>
                             </td>
@@ -131,11 +135,11 @@
 
                     {{#if agent}}
                         <tr>
-                            <td>Agent</td>
+                            <td>{{i18n "Action.agent"}}</td>
                             <td>
                                 <ul class="resource-list truncated">
                                     {{#agent}}
-                                        <li>{{> (stringFormat "ResourceIndex/%s/link.mustache" @type) }}</li>
+                                        <li>{{>ResourceIndex/link.mustache}}</li>
                                     {{/agent}}
                                 </ul>
                             </td>
@@ -144,11 +148,11 @@
 
                     {{#if participant}}
                         <tr>
-                            <td>Participant</td>
+                            <td>{{i18n "Action.participant"}}</td>
                             <td>
                                 <ul class="resource-list truncated">
                                     {{#participant}}
-                                        <li>{{> (stringFormat "ResourceIndex/%s/link.mustache" @type) }}</li>
+                                        <li>{{>ResourceIndex/link.mustache}}</li>
                                     {{/participant}}
                                 </ul>
                             </td>
@@ -157,11 +161,11 @@
 
                     {{#if instrument}}
                         <tr>
-                            <td>Instrument</td>
+                            <td>{{i18n "Action.instrument"}}</td>
                             <td>
                                 <ul class="resource-list truncated">
                                     {{#instrument}}
-                                        <li>{{> (stringFormat "ResourceIndex/%s/link.mustache" @type) }}</li>
+                                        <li>{{>ResourceIndex/link.mustache}}</li>
                                     {{/instrument}}
                                 </ul>
                             </td>
@@ -170,21 +174,47 @@
 
                     {{#if result}}
                         <tr>
-                            <td>Result</td>
+                            <td>{{i18n "Action.result"}}</td>
                             <td>
                                 <ul class="resource-list truncated">
                                     {{#result}}
-                                        <li>{{> (stringFormat "ResourceIndex/%s/link.mustache" @type) }}</li>
+                                        <li>{{>ResourceIndex/link.mustache}}</li>
                                     {{/result}}
                                 </ul>
                             </td>
                         </tr>
                     {{/if}}
 
+                    {{#if funder}}
+                        <tr>
+                            <td>{{i18n "Action.funder"}}</td>
+                            <td>
+                                <ul class="resource-list truncated">
+                                    {{#funder}}
+                                        <li>{{>ResourceIndex/link.mustache}}</li>
+                                    {{/funder}}
+                                </ul>
+                            </td>
+                        </tr>
+                    {{/if}}
+
+                    {{#if tag}}
+                        <tr>
+                            <td>{{i18n "Action.tag"}}</td>
+                            <td>
+                                <ul class="comma-seperated-list">
+                                    {{#tag}}
+                                        <li><a href="/resource/?filter.about.tag={{.}}">{{.}}</a></li>
+                                    {{/tag}}
+                              </ul>
+                          </td>
+                      </tr>
+                    {{/if}}
+
 
                 </table>
 
-            </div>
+            </article>
 
         {{/scope}}
 

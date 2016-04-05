@@ -47,7 +47,7 @@ public class BaseRepository extends Repository implements Readable, Writable, Qu
         continue;
       }
       String type = resource.getAsString(JsonLdConstants.TYPE);
-      resource = resource.deleteReferencesTo(aId);
+      resource = resource.removeAllReferencesTo(aId);
       addResource(getRecord(resource), type);
     }
 

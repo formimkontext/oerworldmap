@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -42,11 +43,11 @@ public class UserIndex extends OERWorldMap {
 
   public static Result list() throws IOException {
     Map<String, Object> scope = new HashMap<>();
-    scope.put("countries", Countries.list(currentLocale));
+    scope.put("countries", Countries.list(Locale.getDefault()));
     return ok(render("Registration", "UserIndex/index.mustache", scope));
   }
 
-  public static Result create() throws IOException {
+  public static Result register() throws IOException {
 
     Resource user = Resource.fromJson(JSONForm.parseFormData(request().body().asFormUrlEncoded()));
     Map<String, Object> scope = new HashMap<>();
@@ -57,7 +58,7 @@ public class UserIndex extends OERWorldMap {
       ensureEmailUnique(user, report);
     }
     if (!report.isSuccess()) {
-      scope.put("countries", Countries.list(currentLocale));
+      scope.put("countries", Countries.list(Locale.getDefault()));
       scope.put("user", user);
       return badRequest(render("Registration", "UserIndex/index.mustache", scope,
           JSONForm.generateErrorReport(report)));
@@ -74,6 +75,44 @@ public class UserIndex extends OERWorldMap {
     messages.add(message);
     return ok(render("Registration", "feedback.mustache", scope, messages));
 
+  }
+
+  public static Result create() throws IOException {
+    boolean isJsonRequest = true;
+    JsonNode json = request().body().asJson();
+    if (null == json) {
+      Map<String, String[]> formUrlEncoded = request().body().asFormUrlEncoded();
+      if (null == formUrlEncoded) {
+        return badRequest("Empty request body");
+      }
+      json = JSONForm.parseFormData(formUrlEncoded, true);
+      isJsonRequest = false;
+    }
+    Resource resource = Resource.fromJson(json);
+    String id = resource.getAsString(JsonLdConstants.ID);
+    ProcessingReport report = mBaseRepository.validateAndAdd(resource);
+    Map<String, Object> scope = new HashMap<>();
+    scope.put("resource", resource);
+    if (!report.isSuccess()) {
+      scope.put("countries", Countries.list(Locale.getDefault()));
+      if (isJsonRequest) {
+        return badRequest("Failed to create " + id + "\n" + report.toString() + "\n");
+      } else {
+        List<Map<String, Object>> messages = new ArrayList<>();
+        HashMap<String, Object> message = new HashMap<>();
+        message.put("level", "warning");
+        message.put("message", OERWorldMap.messages.getString("schema_error")  + "<pre>" + report.toString() + "</pre>"
+          + "<pre>" + resource + "</pre>");
+        messages.add(message);
+        return badRequest(render("Create failed", "feedback.mustache", scope, messages));
+      }
+    }
+    response().setHeader(LOCATION, routes.ResourceIndex.create().absoluteURL(request()).concat(id));
+    if (isJsonRequest) {
+      return created("Created " + id + "\n");
+    } else {
+      return created(render("Created", "created.mustache", scope));
+    }
   }
 
   public static Result read(String id) throws IOException {
@@ -97,7 +136,7 @@ public class UserIndex extends OERWorldMap {
     Map<String, Object> scope = new HashMap<>();
     scope.put("resource", resource);
     if (!report.isSuccess()) {
-      scope.put("countries", Countries.list(currentLocale));
+      scope.put("countries", Countries.list(Locale.getDefault()));
       if (isJsonRequest) {
         return badRequest("Failed to update " + id + "\n" + report.toString() + "\n");
       } else {
@@ -137,9 +176,11 @@ public class UserIndex extends OERWorldMap {
     String token = Account.createTokenFor(user);
     if (!StringUtils.isEmpty(token) && !StringUtils.isEmpty(mConf.getString("mail.smtp.host"))) {
       sendTokenMail(user, token);
-    } else {
-      Logger.info("No mailserver specified, cannot send ".concat(token).concat( " to "
+    } else if (!StringUtils.isEmpty(token)) {
+      Logger.warn("No mailserver specified, cannot send ".concat(token).concat(" to "
         .concat(user.getAsString("email"))));
+    } else {
+      Logger.warn("Could not get token for ".concat(user.getAsString("email")));
     }
 
     scope.put("continue", "<a class=\"hijax\" target=\"_self\" href=\"/.auth\">".concat(

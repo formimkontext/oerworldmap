@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,6 +27,7 @@ import play.mvc.Result;
 import services.QueryContext;
 
 import services.AggregationProvider;
+import services.SearchConfig;
 import services.export.AbstractCsvExporter;
 import services.export.CsvWithNestedIdsExporter;
 
@@ -58,6 +60,7 @@ public class ResourceIndex extends OERWorldMap {
       "about.mainEntity.@id", "about.mainEntity.@type", "about.mainEntity.name", "about.mainEntity.location"
     });
 
+    queryContext.setElasticsearchFieldBoosts(new SearchConfig().getBoostsForElasticsearch());
 
     Map<String, Object> scope = new HashMap<>();
     ResourceList resourceList = mBaseRepository.query(q, from, size, sort, filters, queryContext);
@@ -94,12 +97,23 @@ public class ResourceIndex extends OERWorldMap {
       isJsonRequest = false;
     }
     Resource resource = Resource.fromJson(json);
+
+    // Person create through UserIndex, which is restricted to admin
+    if ("Person".equals(resource.getAsString(JsonLdConstants.TYPE))) {
+      List<Map<String, Object>> messages = new ArrayList<>();
+      HashMap<String, Object> message = new HashMap<>();
+      message.put("level", "warning");
+      message.put("message", "Forbidden");
+      messages.add(message);
+      return forbidden(render("Update failed", "feedback.mustache", resource, messages));
+    }
+
     String id = resource.getAsString(JsonLdConstants.ID);
     ProcessingReport report = mBaseRepository.validateAndAdd(resource);
     Map<String, Object> scope = new HashMap<>();
     scope.put("resource", resource);
     if (!report.isSuccess()) {
-      scope.put("countries", Countries.list(currentLocale));
+      scope.put("countries", Countries.list(Locale.getDefault()));
       if (isJsonRequest) {
         return badRequest("Failed to create " + id + "\n" + report.toString() + "\n");
       } else {
@@ -206,7 +220,7 @@ public class ResourceIndex extends OERWorldMap {
     Map<String, Object> scope = new HashMap<>();
     scope.put("resource", resource);
     if (!report.isSuccess()) {
-      scope.put("countries", Countries.list(currentLocale));
+      scope.put("countries", Countries.list(Locale.getDefault()));
       if (isJsonRequest) {
         return badRequest("Failed to update " + id + "\n" + report.toString() + "\n");
       } else {

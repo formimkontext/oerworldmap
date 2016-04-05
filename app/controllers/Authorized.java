@@ -108,6 +108,10 @@ public class Authorized extends Action.Simple {
       }
     }
 
+    // FIXME: activity based auth should make this superfluous,
+    // but currently needed in front end templates
+    user.put("roles", getUserRoles(user, parameters));
+
     QueryContext queryContext;
     if (getUserActivities(user, parameters).contains(activity)) {
       queryContext = new QueryContext(user.getId(), getUserRoles(user, parameters));
@@ -143,8 +147,11 @@ public class Authorized extends Action.Simple {
     List<String> roles = new ArrayList<>();
 
     for(Map.Entry<String, List<String>> role : mRoles.entrySet()) {
-      if (role.getValue().contains(user.getId())) {
+      if (role.getValue().contains(user.getId()) || role.getValue().contains(user.getAsString("email"))) {
+        Logger.debug("Adding role " + role.getKey() + " for " + user.getId());
         roles.add(role.getKey());
+      } else {
+        Logger.debug("Not adding role " + role.getKey() + " for " + user.getId());
       }
     }
 

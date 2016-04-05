@@ -14,7 +14,7 @@
 
         {{#scope}}
 
-            <div class="resource">
+            <article class="resource" data-behaviour="populateMap">
 
                 <script type="application/ld+json">
                     {{{.}}}
@@ -29,13 +29,17 @@
                 <div class="resource-header">
 
                     <h1 class="resource-title">
-                        <i class="fa fa-users"></i>
-                        {{#name}}{{@value}}{{/name}}
+                        {{getIcon @type}}
+                        {{#localized name}}
+                            {{[@value]}}
+                        {{else}}
+                            {{[@id]}}
+                        {{/localized}}
                     </h1>
 
                     {{#countryChampionFor}}
                         <div class="resource-subline">
-                            Country Champion for <a href="/country/{{.}}">{{i18n . bundle="countries"}}</a>
+                            {{i18n "Organization.countryChampionFor"}} <a href="/country/{{.}}">{{i18n . bundle="countries"}}</a>
                         </div>
                     {{/countryChampionFor}}
 
@@ -49,9 +53,9 @@
                     </div>
                 {{/image}}
 
-                {{#description}}
-                    <p>{{{@value}}}</p>
-                {{/description}}
+                {{#localized description}}
+                    <p>{{{[@value]}}}</p>
+                {{/localized}}
 
                 {{#url}}
                     <p>
@@ -66,7 +70,7 @@
 
                     {{#if email}}
                         <tr>
-                            <td>Email Address</td>
+                            <td>{{i18n "Organization.email"}}</td>
                             <td>
                                 <a href="mailto:{{{obfuscate email}}}">{{{obfuscate email}}}</a>
                             </td>
@@ -74,7 +78,7 @@
                     {{/if}}
 
                     <tr>
-                        <td>Location</td>
+                        <td>{{i18n "Organization.location"}}</td>
                         <td>
                             {{#location}}
                                 {{>ResourceIndex/Place/read.mustache}}
@@ -84,7 +88,7 @@
 
                     {{#if sameAs}}
                         <tr>
-                            <td>Links</td>
+                            <td>{{i18n "Organization.sameAs"}}</td>
                             <td>
                                 <ul class="resource-list truncated">
                                     {{#sameAs}}
@@ -97,11 +101,11 @@
 
                     {{#if contactPoint}}
                         <tr>
-                            <td>Contact Person</td>
+                            <td>{{i18n "Organization.contactPoint"}}</td>
                             <td>
                                 <ul class="resource-list truncated">
                                     {{#contactPoint}}
-                                        <li>{{> (stringFormat "ResourceIndex/%s/link.mustache" @type) }}</li>
+                                        <li>{{>ResourceIndex/link.mustache}}</li>
                                     {{/contactPoint}}
                                 </ul>
                             </td>
@@ -110,11 +114,11 @@
 
                     {{#if created}}
                         <tr>
-                            <td>Author of</td>
+                            <td>{{i18n "Organization.created"}}</td>
                             <td>
                                 <ul class="resource-list truncated">
                                     {{#created}}
-                                        <li>{{> (stringFormat "ResourceIndex/%s/link.mustache" @type) }}</li>
+                                        <li>{{>ResourceIndex/link.mustache}}</li>
                                     {{/created}}
                                 </ul>
                             </td>
@@ -123,11 +127,11 @@
 
                     {{#if mainEntityOf}}
                         <tr>
-                            <td>Topic of</td>
+                            <td>{{i18n "Organization.mainEntityOf"}}</td>
                             <td>
                                 <ul class="resource-list truncated">
                                     {{#mainEntityOf}}
-                                        <li>{{> (stringFormat "ResourceIndex/%s/link.mustache" @type) }}</li>
+                                        <li>{{>ResourceIndex/link.mustache}}</li>
                                     {{/mainEntityOf}}
                                 </ul>
                             </td>
@@ -136,11 +140,11 @@
 
                     {{#if mentionedIn}}
                         <tr>
-                            <td>{{i18n "mentioned_in"}}</td>
+                            <td>{{i18n "Organization.mentionedIn"}}</td>
                             <td>
                                 <ul class="resource-list truncated">
                                     {{#mentionedIn}}
-                                        <li>{{> (stringFormat "ResourceIndex/%s/link.mustache" @type) }}</li>
+                                        <li>{{>ResourceIndex/link.mustache}}</li>
                                     {{/mentionedIn}}
                                 </ul>
                             </td>
@@ -149,11 +153,11 @@
 
                     {{#if participantIn}}
                         <tr>
-                            <td>Participant in</td>
+                            <td>{{i18n "Organization.participantIn"}}</td>
                             <td>
                                 <ul class="resource-list truncated">
                                     {{#participantIn}}
-                                        <li>{{> (stringFormat "ResourceIndex/%s/link.mustache" @type) }}</li>
+                                        <li>{{>ResourceIndex/link.mustache}}</li>
                                     {{/participantIn}}
                                 </ul>
                             </td>
@@ -162,11 +166,11 @@
 
                     {{#if provides}}
                         <tr>
-                            <td>Provides</td>
+                            <td>{{i18n "Organization.provides"}}</td>
                             <td>
                                 <ul class="resource-list truncated">
                                     {{#provides}}
-                                        <li>{{> (stringFormat "ResourceIndex/%s/link.mustache" @type) }}</li>
+                                        <li>{{>ResourceIndex/link.mustache}}</li>
                                     {{/provides}}
                                 </ul>
                             </td>
@@ -175,11 +179,11 @@
 
                     {{#if memberOf}}
                         <tr>
-                            <td>Member of</td>
+                            <td>{{i18n "Organization.memberOf"}}</td>
                             <td>
                                 <ul class="resource-list truncated">
                                     {{#memberOf}}
-                                        <li>{{> (stringFormat "ResourceIndex/%s/link.mustache" @type) }}</li>
+                                        <li>{{>ResourceIndex/link.mustache}}</li>
                                     {{/memberOf}}
                                 </ul>
                             </td>
@@ -188,12 +192,38 @@
 
                     {{#if member}}
                         <tr>
-                            <td>Member</td>
+                            <td>{{i18n "Organization.member"}}</td>
                             <td>
                                 <ul class="resource-list truncated">
                                     {{#member}}
-                                        <li>{{> (stringFormat "ResourceIndex/%s/link.mustache" @type) }}</li>
+                                        <li>{{>ResourceIndex/link.mustache}}</li>
                                     {{/member}}
+                                </ul>
+                            </td>
+                        </tr>
+                    {{/if}}
+
+                    {{#if funderOf}}
+                        <tr>
+                            <td>{{i18n "Organization.funderOf"}}</td>
+                            <td>
+                                <ul class="resource-list truncated">
+                                    {{#funderOf}}
+                                        <li>{{>ResourceIndex/link.mustache}}</li>
+                                    {{/funderOf}}
+                                </ul>
+                            </td>
+                        </tr>
+                    {{/if}}
+
+                    {{#if tag}}
+                        <tr>
+                            <td>{{i18n "Organization.tag"}}</td>
+                            <td>
+                                <ul class="comma-seperated-list">
+                                    {{#tag}}
+                                        <li><a href="/resource/?filter.about.tag={{.}}">{{.}}</a></li>
+                                    {{/tag}}
                                 </ul>
                             </td>
                         </tr>
@@ -201,7 +231,7 @@
 
                 </table>
 
-            </div>
+            </article>
 
         {{/scope}}
 

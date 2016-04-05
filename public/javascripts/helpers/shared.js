@@ -246,6 +246,45 @@ if (!Object.keys) {
   return new UrlTemplate();
 }));
 
+Handlebars.registerHelper('localized', function(list, options) {
+  // Get requested language from Java or JS
+  language = java.util.Locale.getDefault() || navigator.language || navigator.userLanguage;
+  var result = '';
+  // Empty list
+  if (!list) {
+    return options.inverse(this);
+  }
+  // Check for entries in requested language
+  for (var i = 0; i < list.length; i++) {
+    if (list[i]['@language'] == language) {
+      result = result + options.fn(list[i]);
+    }
+  }
+  // Requested language not available, default to en
+  if (result.trim() == '') {
+    for (var i = 0; i < list.length; i++) {
+      if (list[i]['@language'] == 'en') {
+        result = result + options.fn(list[i]);
+      }
+    }
+  }
+  // Neither requested language nor en available, return all of first available
+  if (result.trim() == '') {
+    for (var i = 0; i < list.length; i++) {
+      if (list[i]['@language'] == list[0]['@language']) {
+        result = result + options.fn(list[i]);
+      }
+    }
+  }
+
+  if (result.trim() != '') {
+    return result;
+  } else {
+    return options.inverse(this);
+  }
+
+});
+
 Handlebars.registerHelper('getField', function (string, options) {
   var parts = string.split('.');
   var field = parts[parts.length -1];
@@ -380,7 +419,7 @@ Handlebars.registerHelper('removeFilterLink', function (filter, value, href) {
       "xlink:href": href,
       // FIXME: since we cannot access other javascript helpers via Handlebars.helpers (why?),
       // we are accessing the Java handlebars helpers here for internationalization.
-      "xlink:title": Packages.helpers.HandlebarsHelpers._i18n(buckets[i]['key']) + " (" + buckets[i]['doc_count'] + ")"
+      "xlink:title": Packages.helpers.HandlebarsHelpers._i18n(buckets[i]['key'], null) + " (" + buckets[i]['doc_count'] + ")"
     }, path);
     arcs.push(arc);
   }
@@ -462,7 +501,7 @@ function nestedAggregation(aggregation, collapsed, id) {
           '<div class="schema-tree-item">' +
             '<i class="fa fa-fw fa-tag schema-tree-icon"></i>' +
             '<a href="/resource/' + key + '">' +
-              Packages.helpers.HandlebarsHelpers._i18n(key) + " (" + aggregation[key]["doc_count"] + ")" +
+              Packages.helpers.HandlebarsHelpers._i18n(key, null) + " (" + aggregation[key]["doc_count"] + ")" +
             '</a>' +
             (
               Object.keys(aggregation[key]).length > 1 ?
@@ -505,4 +544,13 @@ Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
       return options.inverse(this);
   }
 
+});
+
+Handlebars.registerHelper('ifIn', function(item, list, options) {
+  for (i in list) {
+    if (list[i] == item) {
+      return options.fn(this);
+    }
+  }
+  return options.inverse(this);
 });

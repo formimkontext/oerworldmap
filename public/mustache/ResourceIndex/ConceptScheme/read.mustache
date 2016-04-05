@@ -23,15 +23,15 @@
                 <div class="resource-header">
 
                     <h1 class="resource-title">
-                        {{getIcon "ConceptScheme"}}
+                        {{getIcon @type}}
                         {{i18n @id}}
                     </h1>
 
                 </div>
 
-                {{#description}}
-                    <p>{{{@value}}}</p>
-                {{/description}}
+                {{#localized description}}
+                    <p>{{{[@value]}}}</p>
+                {{/localized}}
 
                 {{nestedAggregation aggregation.services}}
 

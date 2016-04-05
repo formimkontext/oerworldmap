@@ -14,7 +14,7 @@
 
         {{#scope}}
 
-            <div class="resource">
+            <article class="resource" data-behaviour="populateMap">
 
                 <script type="application/ld+json">
                     {{{.}}}
@@ -29,8 +29,12 @@
                     {{/if}}
 
                     <h1 class="resource-title">
-                        <i class="fa fa-desktop"></i>
-                        {{#name}}{{@value}}{{/name}}
+                        {{getIcon @type}}
+                        {{#localized name}}
+                            {{[@value]}}
+                        {{else}}
+                            {{[@id]}}
+                        {{/localized}}
                     </h1>
 
                     {{#serviceType}}
@@ -50,9 +54,9 @@
                     </div>
                 {{/image}}
 
-                {{#description}}
-                    <p>{{{@value}}}</p>
-                {{/description}}
+                {{#localized description}}
+                    <p>{{{[@value]}}}</p>
+                {{/localized}}
 
                 {{#availableChannel}}{{#serviceUrl}}
                     <p>
@@ -66,7 +70,7 @@
                 <table class="table resource-details-table">
 
                     <tr>
-                        <td>Languages</td>
+                        <td>{{i18n "Service.availableChannel.availableLanguage"}}</td>
                         <td>
                             <ul class="comma-seperated-list">
                                 {{#availableChannel}}
@@ -79,11 +83,11 @@
                     </tr>
 
                     <tr>
-                        <td>Audience</td>
+                        <td>{{i18n "Service.audience"}}</td>
                         <td>
                             <ul class="resource-list truncated">
                                 {{#audience}}
-                                    <li>{{> (stringFormat "ResourceIndex/%s/link.mustache" @type) }}</li>
+                                    <li>{{>ResourceIndex/link.mustache}}</li>
                                 {{/audience}}
                             </ul>
                         </td>
@@ -91,11 +95,11 @@
 
                     {{#if provider}}
                         <tr>
-                            <td>Provider</td>
+                            <td>{{i18n "Service.provider"}}</td>
                             <td>
                                 <ul class="resource-list truncated">
                                     {{#provider}}
-                                        <li>{{> (stringFormat "ResourceIndex/%s/link.mustache" @type) }}</li>
+                                        <li>{{>ResourceIndex/link.mustache}}</li>
                                     {{/provider}}
                                 </ul>
                             </td>
@@ -104,11 +108,11 @@
 
                     {{#if about}}
                         <tr>
-                            <td>Subjects</td>
+                            <td>{{i18n "Service.about"}}</td>
                             <td>
                                 <ul class="resource-list truncated">
                                     {{#about}}
-                                        <li>{{> (stringFormat "ResourceIndex/%s/link.mustache" @type) }}</li>
+                                        <li>{{>ResourceIndex/link.mustache}}</li>
                                     {{/about}}
                                 </ul>
                             </td>
@@ -117,7 +121,7 @@
 
                     {{#if sameAs}}
                         <tr>
-                            <td>Links</td>
+                            <td>{{i18n "Service.sameAs"}}</td>
                             <td>
                                 <ul class="resource-list truncated">
                                     {{#sameAs}}
@@ -130,12 +134,25 @@
 
                     {{#if memberOf}}
                         <tr>
-                            <td>Member of</td>
+                            <td>{{i18n "Service.memberOf"}}</td>
                             <td>
                                 <ul class="resource-list truncated">
                                     {{#memberOf}}
-                                        <li>{{> (stringFormat "ResourceIndex/%s/link.mustache" @type) }}</li>
+                                        <li>{{>ResourceIndex/link.mustache}}</li>
                                     {{/memberOf}}
+                                </ul>
+                            </td>
+                        </tr>
+                    {{/if}}
+
+                    {{#if tag}}
+                        <tr>
+                            <td>{{i18n "Service.tag"}}</td>
+                            <td>
+                                <ul class="comma-seperated-list">
+                                    {{#tag}}
+                                        <li><a href="/resource/?filter.about.tag={{.}}">{{.}}</a></li>
+                                    {{/tag}}
                                 </ul>
                             </td>
                         </tr>
@@ -143,7 +160,7 @@
 
                 </table>
 
-            </div>
+            </article>
 
         {{/scope}}
 
