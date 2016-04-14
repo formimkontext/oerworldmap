@@ -1,6 +1,7 @@
 package services;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -111,6 +112,23 @@ public class BaseRepositoryTest extends ElasticsearchTestGrid implements JsonTes
     Resource get2 = mBaseRepo.getResource(out2.getAsString(JsonLdConstants.ID));
     assertEquals(out1, get1);
     assertEquals(out2, get2);
+  }
+
+  @Test
+  public void testChangeResourceTypeSimple() throws IOException {
+
+    Resource db1 = getResourceFromJsonFile("BaseRepositoryTest/testChangeResourceTypeSimple.DB.1.json");
+    Resource update1 = getResourceFromJsonFile("BaseRepositoryTest/testChangeResourceTypeSimple.IN.1.json");
+    assertEquals(db1.getId(), update1.getId());
+    assertNotEquals(db1.getAsString(JsonLdConstants.TYPE), update1.getAsString(JsonLdConstants.TYPE));
+
+    mBaseRepo.addResource(db1, new HashMap<>());
+    mBaseRepo.addResource(update1, new HashMap<>());
+
+    Resource get1 = mBaseRepo.getResource(update1.getAsString(JsonLdConstants.ID));
+
+    assertEquals(update1, get1);
+
   }
 
 }
