@@ -116,19 +116,28 @@ public class BaseRepositoryTest extends ElasticsearchTestGrid implements JsonTes
 
   @Test
   public void testChangeResourceTypeSimple() throws IOException {
-
     Resource db1 = getResourceFromJsonFile("BaseRepositoryTest/testChangeResourceTypeSimple.DB.1.json");
     Resource update1 = getResourceFromJsonFile("BaseRepositoryTest/testChangeResourceTypeSimple.IN.1.json");
     assertEquals(db1.getId(), update1.getId());
     assertNotEquals(db1.getAsString(JsonLdConstants.TYPE), update1.getAsString(JsonLdConstants.TYPE));
-
     mBaseRepo.addResource(db1, new HashMap<>());
     mBaseRepo.addResource(update1, new HashMap<>());
-
     Resource get1 = mBaseRepo.getResource(update1.getAsString(JsonLdConstants.ID));
-
     assertEquals(update1, get1);
+  }
 
+  @Test
+  public void testChangeResourceTypeMismatch() throws IOException {
+    Resource db1 = getResourceFromJsonFile("BaseRepositoryTest/testChangeResourceTypeMismatch.DB.1.json");
+    mBaseRepo.addResource(db1, new HashMap<>());
+    // change type:
+    db1.put(JsonLdConstants.TYPE, "Organization");
+    // try to update changed resource
+    mBaseRepo.validateAndAdd(db1, new HashMap<>());
+    // resource should not be updated due to data model mismatch: Organization
+    // may not have a provider
+    Resource get1 = mBaseRepo.getResource(db1.getId());
+    assertEquals("Service", get1.getAsString(JsonLdConstants.TYPE));
   }
 
 }
