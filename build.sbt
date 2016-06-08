@@ -1,6 +1,7 @@
 name := "oerworldmap"
 
 version := "0.1"
+scalaVersion := "2.11.8"
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
@@ -21,7 +22,8 @@ libraryDependencies ++= Seq(
   "org.apache.jena" % "apache-jena-libs" % "2.13.0",
   "io.apigee.trireme" % "trireme-kernel" % "0.8.8",
   "io.apigee.trireme" % "trireme-core" % "0.8.8",
-  "io.apigee.trireme" % "trireme-node10src" % "0.8.8"
+  "io.apigee.trireme" % "trireme-node10src" % "0.8.8",
+  "com.typesafe.akka" %% "akka-slf4j" % "2.4.5"
 )
 
 includeFilter in (Assets, LessKeys.less) := "main.less"
