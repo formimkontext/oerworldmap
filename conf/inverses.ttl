@@ -19,4 +19,6 @@
 :performerIn owl:inverseOf :performer .
 :funder owl:inverseOf :funderOf .
 :funderOf owl:inverseOf :funder .
+:sourceOrganization owl:inverseOf :mainEntityOfPage .
+:mainEntityOfPage owl:inverseOf :sourceOrganization .
 :knows owl:inverseOf :knows .
