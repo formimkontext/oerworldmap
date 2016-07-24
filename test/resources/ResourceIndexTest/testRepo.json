@@ -1,0 +1,28 @@
+{
+  "@context": "http://schema.org",
+  "@id": "urn:uuid:eea2cb2a-9f4c-11e5-945f-1edusharing16",
+  "@type": "CreativeWork",
+  "name": [
+    {
+      "@language": "en",
+      "@value": "edu-sharing test-repo"
+    }
+  ],
+  "sourceOrganization": {
+    "@type": "Organization",
+    "name": [
+      {
+        "@value": "ConnectedOrganization2000",
+        "@language": "en"
+      }
+    ],
+    "description": [
+      {
+        "@value": "An organization connected to the edu-sharing NETWORK",
+        "@language": "en"
+      }
+    ],
+    "@id": "urn:uuid:eea2cb2a-9f4c-11e5-2000-1edusharing16",
+    "url": "https://weareconnectedtotheedusharingnetwork.org/"
+  }
+}
