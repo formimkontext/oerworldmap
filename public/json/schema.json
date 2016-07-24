@@ -959,12 +959,25 @@
           "type": "array",
           "items": {
                 "$ref": "#/definitions/Event"
+          }
+        },
+        "mainEntityOfPage": {
+          "description": "A creative work or URL to a creative work this thing is about.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "$ref": "#/definitions/CreativeWork"
               }
+            ]
+          }
         }
       },
-      "required": [
-        "name"
-      ],
       "additionalProperties": false
     },
     "Event": {
