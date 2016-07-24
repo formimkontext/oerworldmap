@@ -1,0 +1,79 @@
+{
+  "@context": "http://schema.org/",
+  "@id": "urn:uuid:88b18924-9f41-11e5-cwcw-001999ac7927",
+  "@type": "CreativeWork",
+  "name": [
+    {
+      "@language": "en",
+      "@value": "OER Creative Work"
+    }
+  ],
+  "alternateName": [
+    {
+      "@language": "en",
+      "@value": "OER CW"
+    }
+  ],
+  "description": [
+    {
+      "@language": "en",
+      "@value": "OER Creative Work is a temporary placeholder for OER repository."
+    }
+  ],
+  "image": "https://pixabay.com/static/uploads/photo/2013/07/19/18/18/cletrac-165369_960_720.jpg",
+  "sameAs": [
+    "https://twitter.com/oercreativework",
+    "https://facebook.com/oercreativework"
+  ],
+  "about": [
+    {
+      "@id": "https://w3id.org/class/esc/n052",
+      "@type": "Concept",
+      "name": [
+        {
+          "@language": "en",
+          "@value": "foo"
+        }
+      ]
+    },
+    {
+      "@id": "https://w3id.org/class/esc/n051",
+      "@type": "Concept",
+      "name": [
+        {
+          "@language": "en",
+          "@value": "bar"
+        }
+      ]
+    }
+  ],
+  "mentionedIn": [
+    {
+      "@id": "urn:uuid:10a0c842-2fa6-11e5-a60f-001999ac7927",
+      "@type": "Article",
+      "name": [
+        {
+          "@language": "en",
+          "@value": "Story"
+        }
+      ]
+    }
+  ],
+  "mainEntityOf": [
+    {
+      "@id": "urn:uuid:645be71a-50a2-11e5-b47d-001999ac7927",
+      "@type": "Article",
+      "name": [
+        {
+          "@language": "en",
+          "@value": "Ztory"
+        }
+      ]
+    }
+  ],
+  "keywords": [
+    "foo",
+    "bar",
+    "baz"
+  ]
+}
