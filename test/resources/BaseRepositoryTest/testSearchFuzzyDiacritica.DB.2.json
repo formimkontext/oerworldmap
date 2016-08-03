@@ -1,0 +1,29 @@
+{
+  "@type" : "Organization",
+  "name" : [ {
+    "@value" : "Délégation interministérielle",
+    "@language" : "fr"
+  } ],
+  "alternateName" : [ {
+    "@value" : "DI",
+    "@language" : "fr"
+  } ],
+  "location" : {
+    "geo" : {
+      "lon" : 2.30841,
+      "lat" : 48.85048
+    },
+    "address" : {
+      "addressCountry" : "FR",
+      "addressLocality" : "Paris"
+    }
+  },
+  "description": [
+    {
+      "@value": "Délégation interministérielle is an organization that should be found by searching for \"Délégation\" as well as by searching for \"Delegation\".",
+      "@language": "en"
+    }
+  ],
+  "@id" : "urn:uuid:b172fce9-7650-4be5-a5ce-f1b6test1000",
+  "@context": "http://schema.org/"
+}

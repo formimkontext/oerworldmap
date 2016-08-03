@@ -344,8 +344,6 @@ public class BaseRepositoryTest extends ElasticsearchTestGrid implements JsonTes
     List<Resource> alternateQuery = mBaseRepo.query("Le Test", 0, 10, null, null, queryContext).getItems();
     Assert.assertTrue("Could not find \"Le Test\".", alternateQuery.size() == 1);
 
-    System.out.println("alternateName: " + getNameList(alternateQuery));
-
     mBaseRepo.deleteResource("urn:uuid:c407eede-7f00-11e5-a636-c48e8ff00001", mMetadata);
     mBaseRepo.deleteResource("urn:uuid:c407eede-7f00-11e5-a636-c48e8ff00002", mMetadata);
   }
@@ -373,21 +371,32 @@ public class BaseRepositoryTest extends ElasticsearchTestGrid implements JsonTes
   @Test
   public void testSearchFuzzyDiacritica() throws IOException, InterruptedException {
     Resource db1 = getResourceFromJsonFile("BaseRepositoryTest/testSearchFuzzyDiacritica.DB.1.json");
+    Resource db2 = getResourceFromJsonFile("BaseRepositoryTest/testSearchFuzzyDiacritica.DB.2.json");
     mBaseRepo.addResource(db1, mMetadata);
+    mBaseRepo.addResource(db2, mMetadata);
 
     QueryContext queryContext = new QueryContext(null);
     queryContext.setElasticsearchFieldBoosts(new SearchConfig().getBoostsForElasticsearch());
 
-    // query with diacritica
-    List<Resource> correctQuery = mBaseRepo.query("tóobar.ao", 0, 10, null, null, queryContext).getItems();
-    Assert.assertTrue("Could not find \"tóobar.ao\".", correctQuery.size() == 1);
+    // query Resource 1 with diacritica
+    List<Resource> correctQuery1 = mBaseRepo.query("tóobar.ao", 0, 10, null, null, queryContext).getItems();
+    Assert.assertTrue("Could not find \"tóobar.ao\".", correctQuery1.size() == 1);
 
-    // query without diacritica
-    List<Resource> alternateQuery = mBaseRepo.query("toobar.ao", 0, 10, null, null, queryContext).getItems();
-    Assert.assertTrue("Could not find \"toobar.ao\".", alternateQuery.size() == 1);
+    // query Resource 1 without diacritica
+    List<Resource> alternateQuery1 = mBaseRepo.query("toobar.ao", 0, 10, null, null, queryContext).getItems();
+    Assert.assertTrue("Could not find \"toobar.ao\".", alternateQuery1.size() == 1);
+
+    // query Resource 2 with diacritica
+    List<Resource> correctQuery2 = mBaseRepo.query("Délégation", 0, 10, null, null, queryContext).getItems();
+    Assert.assertTrue("Could not find \"Délégation\".", correctQuery2.size() == 1);
+
+    // query Resource 2 without diacritica
+    List<Resource> alternateQuery2 = mBaseRepo.query("Delegation", 0, 10, null, null, queryContext).getItems();
+    Assert.assertTrue("Could not find \"Delegation\".", alternateQuery2.size() == 1);
 
     mBaseRepo.deleteResource("urn:uuid:9843bac3-028f-4be8-ac54-92dcfeb00001", mMetadata);
     mBaseRepo.deleteResource("urn:uuid:9843bac3-028f-4be8-ac54-92dcfeb00002", mMetadata);
+    mBaseRepo.deleteResource("urn:uuid:b172fce9-7650-4be5-a5ce-f1b6test1000", mMetadata);
   }
 
   private List<String> getNameList(List<Resource> aResourceList) {
